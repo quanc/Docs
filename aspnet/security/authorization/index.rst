@@ -4,8 +4,12 @@ Authorization
 .. toctree::
    :titlesonly:
 
+   
+   introduction
+   simple
    roles
    claims
-   oauth2
-   
-
+   policies
+   resourcebased
+   views
+   limitingidentitybyscheme
