@@ -1,5 +1,5 @@
-Authorization
--------------
+Authentication
+--------------
 
 .. toctree::
    :titlesonly:

@@ -39,7 +39,9 @@ If you want to apply authorization to an action rather than the controller simpl
 
 Now only authenticated users can access the logout function.
 
-You can also use the AllowAnonymous attribute to allow access by non-authenticated users to individual actions; for example the following usage will only allow authenticated users to the Account controller, except for the Login action, which is accessible by everyone, regardless of their authenticated or unauthenticated / anonymous status.
+You can also use the AllowAnonymous attribute to allow access by non-authenticated users to individual actions; for example
+
+.. code-block:: c#
 
   [Authorize]
   public class AccountController : Controller
@@ -53,3 +55,5 @@ You can also use the AllowAnonymous attribute to allow access by non-authenticat
       {      
       }
   }
+
+This would allow only authenticated users to the Account controller, except for the Login action, which is accessible by everyone, regardless of their authenticated or unauthenticated / anonymous status.

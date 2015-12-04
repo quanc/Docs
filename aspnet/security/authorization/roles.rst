@@ -109,6 +109,7 @@ If you want to specify multiple allowed roles in a requirement then you you can 
 
 .. code-block:: c#
 
-  options.AddPolicy("ElevatedRights", policy => policy.RequireRole("Administrator", "PowerUser", "BackupAdministrator"));
+  options.AddPolicy("ElevatedRights", policy => 
+                    policy.RequireRole("Administrator", "PowerUser", "BackupAdministrator"));
 
 This example would authorize any user who has a role of Administrator, PowerUser and/or BackupAdministrator.

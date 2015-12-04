@@ -15,9 +15,10 @@ An authorization policy is made up of one or more requirements and registered at
 
      services.AddAuthorization(options =>
      {
-         options.AddPolicy("Over21", policy => policy.Requirements.Add(new Authorization.MinimumAgeRequirement(21)));
+         options.AddPolicy("Over21", 
+                           policy => policy.Requirements.Add(new Authorization.MinimumAgeRequirement(21)));
      }
-}
+ }
 
 Here you can see an Over21 policy is created with a single requirement, that of a minimum age, which is passed as a parameter to the requirement.
 
@@ -55,13 +56,18 @@ An authorization requirement is a collection of data parameters that a policy ca
 
 A requirement doesn't have to have any data or properties.
 
+.. _security-authorization-policies-based-authorization-handler:
+
 Authorization Handlers
 ----------------------
 
-An authorization handler is responsible for evaluation any properties of a requirement and evaluate them against a provided AuthorizationContext to make a decision if authorization is allowed. A requirement can have :ref:`multiple handlers <security-authorization-policies-based-multiple-handlers>`. Handlers must inherit AuthorizationHandler<T> where T is the requirement they handle. Our minimum age handler might look like so;
+An authorization handler is responsible for evaluation any properties of a requirement and evaluate them against a provided AuthorizationContext to make a decision if authorization is allowed. A requirement can have :ref:`multiple handlers <security-authorization-policies-based-multiple-handlers>`. Handlers must inherit ``AuthorizationHandler<T>`` where T is the requirement they handle. 
 
 .. _security-authorization-handler-example:
-.. code-block::c#
+
+Our minimum age handler might look like so;
+
+.. code-block:: c#
 
  public class MinimumAgeHandler : AuthorizationHandler<MinimumAgeRequirement>
  {
@@ -93,7 +99,7 @@ In the code above we first look to see if the current user principal has a date 
 
 Handlers must be registered in the services collection during configuration, for example;
 
-..code-block::c#
+.. code-block:: c#
 
  public void ConfigureServices(IServiceCollection services)
  {
@@ -101,12 +107,14 @@ Handlers must be registered in the services collection during configuration, for
 
      services.AddAuthorization(options =>
      {
-         options.AddPolicy("Over21", policy => policy.Requirements.Add(new Authorization.MinimumAgeRequirement(21)));
+         options.AddPolicy("Over21", 
+                           policy => policy.Requirements.Add(new Authorization.MinimumAgeRequirement(21)));
      });
 
      services.AddInstance<IAuthorizationHandler>(new Authorization.MinimumAgeHandler());
  }
 
+Each handler is added to the services collection by using ``services.AddInstance<IAuthorizationHandler>()`` and passing in an instance of the handler.
 
 What should a handler return?
 -----------------------------
@@ -115,9 +123,9 @@ You can see in our :ref:`handler example <security-authorization-handler-example
 
 * A handler indicates success by calling ``context.Succeed(IAuthorizationRequirement requirement)``, passing the requirement that has been successfully validate.
 * A handler indicates failure by doing nothing at all, but other handlers for the same requirement may succeed.
-* In catastrophic cases, where you want to ensure failure even if other handlers for a requirement succeed you can call context.Fail(). 
+* In catastrophic cases, where you want to ensure failure even if other handlers for a requirement succeed you can call ``context.Fail()``. 
  
-Regardless of what you call inside your handler all handlers for a requirement will be called when a policy requires the requirement. This allows requirements to have side effects, such as logging, which will always take place even if Fail() has been called in another handler.
+Regardless of what you call inside your handler all handlers for a requirement will be called when a policy requires the requirement. This allows requirements to have side effects, such as logging, which will always take place even if ``context.Fail()`` has been called in another handler.
 
 .. _security-authorization-policies-based-multiple-handlers:
 
@@ -136,7 +144,8 @@ In cases where you want evaluation to be on an OR basis you implement multiple h
  {
      protected override void Handle(AuthorizationContext context, EnterBuildingRequirement requirement)
      {
-         if (context.User.HasClaim(c => c.Type == ClaimTypes.BadgeId && c.Issuer == "http://microsoftsecurity"))
+         if (context.User.HasClaim(c => c.Type == ClaimTypes.BadgeId && 
+                                        c.Issuer == "http://microsoftsecurity"))
          {
              context.Succeed(requirement);
          }
@@ -147,7 +156,8 @@ In cases where you want evaluation to be on an OR basis you implement multiple h
  {
      protected override void Handle(AuthorizationContext context, EnterBuildingRequirement requirement)
      {
-         if (context.User.HasClaim(c => c.Type == ClaimTypes.TemporaryBadgeId && c.Issuer == "http://microsoftsecurity"))
+         if (context.User.HasClaim(c => c.Type == ClaimTypes.TemporaryBadgeId && 
+                                        c.Issuer == "http://microsoftsecurity"))
          {
              // We'd also check the expiration date on the sticker.
              context.Succeed(requirement);
@@ -155,12 +165,12 @@ In cases where you want evaluation to be on an OR basis you implement multiple h
      }
  }
 
-Now, assuming both handlers are registered when a policy evaluates the EnterBuildingRequirement if either handler succeeds the policy evaluation will succeed.
+Now, assuming both handlers are `registered <security-authorization-policies-based-handler-registration>` when a policy evaluates the EnterBuildingRequirement if either handler succeeds the policy evaluation will succeed.
 
 Accessing Request Context In Handlers
 -------------------------------------
 
-The Handle method you must implement in a handle has two parameters, an ``AuthorizationContext`` and the ``Requirement`` you are handling. Frameworks such as MVC, or Jabbr are free to add any object to the ``Resource`` property on the AuthorizationContext to pass through extra information.
+The Handle method you must implement in a handle has two parameters, an ``AuthorizationContext`` and the ``Requirement`` you are handling. Frameworks such as MVC or Jabbr are free to add any object to the ``Resource`` property on the AuthorizationContext to pass through extra information.
 
 For example MVC passes an instance of ``Microsoft.AspNet.Mvc.Filters.AuthorizationContext`` in the resource property which be used to access HttpContext, RouteData and everything else MVC provides.
 

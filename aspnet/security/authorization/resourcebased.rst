@@ -26,10 +26,14 @@ Authorization is implemented as a service, ``IAuthorizationService``, registered
 
 .. code-block:: c#
 
- Task<bool> AuthorizeAsync(ClaimsPrincipal user, object resource, [NotNullAttribute] IEnumerable<IAuthorizationRequirement> requirements);
- Task<bool> AuthorizeAsync(ClaimsPrincipal user, object resource, [NotNullAttribute] string policyName);
+ Task<bool> AuthorizeAsync(ClaimsPrincipal user, 
+                           object resource, 
+                           IEnumerable<IAuthorizationRequirement> requirements);
+ Task<bool> AuthorizeAsync(ClaimsPrincipal user, 
+                           object resource, 
+                           string policyName);
 
-To call the service load your resource within your action then call the AuthorizeAsync method you require. For example
+To call the service load your resource within your action then call the ``AuthorizeAsync`` method you require. For example
 
 .. code-block:: c#
 
@@ -57,11 +61,13 @@ Writing a resource based handler
 
 Writing a handler for resource based authorization is not that much different to :ref:`writing a plain requirements handler <security-authorization-policies-based-authorization-handler>`. You create a requirement, and then implement a handler for the requirement, specifying the requirement as before and also the resource type. For example, a handler which might accept a Document resource would look as follows;
 
-.. code-block c#
+.. code-block:: c#
 
   public class DocumentAuthorizationHandler : AuthorizationHandler<MyRequirement, Document>
   {
-      protected override void Handle(AuthorizationContext context, OperationAuthorizationRequirement requirement, Document resource)
+      protected override void Handle(AuthorizationContext context, 
+                                     OperationAuthorizationRequirement requirement, 
+                                     Document resource)
       {
           // Validate the requirement against the resource and identity.
       }
@@ -72,25 +78,34 @@ Operational Requirements
 
 If you are making decisions based on operations such as read, write, update and delete an already defined ``OperationAuthorizationRequirement`` class exists. This enables you to write a single handler which has a parameterized operation name, rather than create individual classes for each operation To use it provide an operation name;
 
-.. code-block c#
+.. code-block:: c#
 
  public static class Operations
  {
-     public static OperationAuthorizationRequirement Create = new OperationAuthorizationRequirement { Name = "Create" };
-     public static OperationAuthorizationRequirement Read = new OperationAuthorizationRequirement   { Name = "Read" };
-     public static OperationAuthorizationRequirement Update = new OperationAuthorizationRequirement { Name = "Update" };
-     public static OperationAuthorizationRequirement Delete = new OperationAuthorizationRequirement { Name = "Delete" };
+     public static OperationAuthorizationRequirement Create = 
+         new OperationAuthorizationRequirement { Name = "Create" };
+     public static OperationAuthorizationRequirement Read = 
+         new OperationAuthorizationRequirement   { Name = "Read" };
+     public static OperationAuthorizationRequirement Update = 
+         new OperationAuthorizationRequirement { Name = "Update" };
+     public static OperationAuthorizationRequirement Delete = 
+         new OperationAuthorizationRequirement { Name = "Delete" };
  }
 
 Your handler could then be implemented as follows, using a hypothetical Document class as the resource;
 
-.. code-block c#
+.. code-block:: c#
 
-  public class DocumentAuthorizationHandler : AuthorizationHandler<OperationAuthorizationRequirement, Document>
+  public class DocumentAuthorizationHandler : 
+      AuthorizationHandler<OperationAuthorizationRequirement, Document>
   {
-      protected override void Handle(AuthorizationContext context, OperationAuthorizationRequirement requirement, Document resource)
+      protected override void Handle(AuthorizationContext context, 
+                                     OperationAuthorizationRequirement requirement, 
+                                     Document resource)
       {
-          // Validate the operation requirement name the value of the  property against the resource and identity.
+          // Validate the operation using the resource, the identity and
+          // the Name property value from the requirement.
       }
   }
 
+You can see the handler works on ``OperationAuthorizationRequirement``. The code inside the handler must take the Name property of the supplied requirement into account when making its evaluations.

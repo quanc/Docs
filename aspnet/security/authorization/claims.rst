@@ -14,7 +14,7 @@ Claim based authorization checks are declarative - the developer embeds them wit
 
 The simplest type of claim policy looks for the presence of a claim and does not check the value.
 
-First you need to build and register the policy. This takes place as part of the Authorization service configuration, which normally takes part in`` ConfigureServices()`` in your ``startup.cs`` file.
+First you need to build and register the policy. This takes place as part of the Authorization service configuration, which normally takes part in ``ConfigureServices()`` in your ``startup.cs`` file.
 
 .. code-block:: c#
 
@@ -28,9 +28,9 @@ First you need to build and register the policy. This takes place as part of the
      }
  }
 
-The EmployeeOnly policy checks for the presence of an EmployeeNumber claim on the current identity.
+In this case the EmployeeOnly policy checks for the presence of an EmployeeNumber claim on the current identity.
 
-You can then apply the policy using the ``Policy`` parameter on the ``Authorize`` attribute to specify the policy name;
+You then apply the policy using the ``Policy`` parameter on the ``Authorize`` attribute to specify the policy name;
 
 .. code-block:: c#
 
@@ -40,7 +40,7 @@ You can then apply the policy using the ``Policy`` parameter on the ``Authorize`
      return View();
  }
 
-The authorize attribute can be applied to an entire controller, in this instance only identities matching the policy will be allowed access to any Action on the controller.
+The ``Authorize`` attribute can be applied to an entire controller, in this instance only identities matching the policy will be allowed access to any Action on the controller.
 
 .. code-block:: c#
 
@@ -52,7 +52,7 @@ The authorize attribute can be applied to an entire controller, in this instance
       }
   }
 
-If you have a controller that is protected by the authorize attribute, but want to allow anonymous access to particular actions you apply the ``AllowAnonymous`` attribute;
+If you have a controller that is protected by the ``Authorize`` attribute, but want to allow anonymous access to particular actions you apply the ``AllowAnonymous`` attribute;
 
 .. code-block:: c#
 
@@ -79,7 +79,8 @@ Remember that most claims come with a value. You can specify a list of allowed v
 
      services.AddAuthorization(options =>
      {
-         options.AddPolicy("Founders", policy => policy.RequireClaim("EmployeeNumber", "1", "2", "3", "4", "5"));
+         options.AddPolicy("Founders", policy => 
+                           policy.RequireClaim("EmployeeNumber", "1", "2", "3", "4", "5"));
      }
  }
 
@@ -88,6 +89,7 @@ Multiple Policy Evaluation
 
 If you apply multiple policies to a controller or action then all policies must pass before access is granted. For example;
 
+.. code-block:: c#
   [Authorize(Policy = "EmployeeOnly")]
   public class SalaryController : Controller
   {  
